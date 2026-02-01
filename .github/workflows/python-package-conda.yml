@@ -1,0 +1,10 @@
+name: Python Package using Conda
+
+on: [push]
+jobs:
+  get-ip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get public IP
+        run: curl -s https://ifconfig.me
+
