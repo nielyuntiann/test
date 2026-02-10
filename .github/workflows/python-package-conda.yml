@@ -21,7 +21,7 @@ jobs:
 
       - name: Start proxy.py
         run: |
-          nohup proxy --hostname 0.0.0.0 --port 8080 &
+          nohup proxy --hostname 0.0.0.0 --port 8080 --plugins proxy.plugin.HttpProxyPlugin &
 
       - name: Install ngrok
         run: |
