@@ -1,44 +1,37 @@
-name: Check IP, Setup Ngrok, Setup Transparent proxy, Run for 10 minutes 
+name: proxy-ngrok-runner
 
 on:
-  workflow_dispatch:   # This makes it selectable and manually runnable in Actions
+  workflow_dispatch:
 
 jobs:
-  setup-proxy:
+  proxy-ngrok:
     runs-on: ubuntu-latest
+    timeout-minutes: 60   # keep low; this job is holding an open tunnel
+
     steps:
-      - name: Get public IP
-        run: curl -s https://ifconfig.me
+      - name: Check out repo
+        uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Show runner public IP
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip curl
+          echo "Public IP (if reachable via ipinfo.io):"
+          curl -s https://ipinfo.io/ip || true
 
-      - name: Install proxy.py
+      - name: Install Python and proxy.py
         run: |
-          pip install proxy.py
+          python3 --version
+          python3 -m pip install --upgrade pip
+          python3 -m pip install proxy.py
 
-      - name: Start proxy.py
+      - name: Start proxy.py on port 8080
         run: |
-          nohup proxy --hostname 0.0.0.0 --port 8080 --plugins proxy.plugin.HttpProxyPlugin &
+          # HTTP/HTTPS proxy on 0.0.0.0:8080
+          nohup python3 -m proxy \
+            --hostname 0.0.0.0 \
+            --port 8080 \
+            --num-workers 1 \
+            > proxy.log 2>&1 &
+          sleep 3
+          echo "proxy.py started on :8080"
 
-      - name: Install ngrok
-        run: |
-          curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
-            | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
-            && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
-            | sudo tee /etc/apt/sources.list.d/ngrok.list \
-            && sudo apt update \
-            && sudo apt install -y ngrok
-
-      - name: Configure ngrok
-        run: |
-          ngrok config add-authtoken 38e34Luh43j1csQO3fF6HKq02ul_2Q72nuQJAG6LuG1jneimq
-
-      - name: Start ngrok tunnel
-        run: |
-          nohup ngrok http 8080 &
-
-      - name: Keep job alive for 10 minutes
-        run: sleep 600
+          while true; do sleep 60; done
