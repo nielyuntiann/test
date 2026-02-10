@@ -1,7 +1,9 @@
 name: Check IP, Setup Ngrok, Setup Transparent proxy, Run for 10 minutes 
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   setup-proxy:
