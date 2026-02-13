@@ -1,0 +1,25 @@
+name: Get IP and Ping Self
+
+on:
+  workflow_dispatch:   # allows manual trigger
+
+jobs:
+  ping-self:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get IP address
+        run: |
+          echo "Fetching IP address..."
+          ip addr show
+          # capture the primary IP (non-loopback)
+          IP=$(hostname -I | awk '{print $1}')
+          echo "Instance IP: $IP"
+          echo "IP=$IP" >> $GITHUB_ENV
+
+      - name: Ping self
+        run: |
+          echo "Pinging $IP ..."
+          ping -c 4 $IP
