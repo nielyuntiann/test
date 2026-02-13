@@ -34,8 +34,9 @@ jobs:
 
       - name: Expose proxy.py via ngrok
         run: |
-          nohup ngrok http 8081 --log=stdout > ngrok.log &
-          sleep 5
+          # nohup ngrok http 8081 --log=stdout > ngrok.log &
+          nohup ngrok tcp 8081 --log=stdout > ngrok.log &
+          sleep 10
           cat ngrok.log
 
       - name: Keep workflow alive for remote testing
