@@ -26,9 +26,9 @@ jobs:
 
       - name: Start proxy.py forward proxy
         run: |
-          nohup python3 -m proxy --hostname 127.0.0.1 --port 8080 &
+          nohup python3 -m proxy --hostname 127.0.0.1 --port 8081 &
           sleep 3
 
       - name: Test proxy with curl
         run: |
-          curl -v --proxy http://127.0.0.1:8080 http://google.com
+          curl -v --proxy http://127.0.0.1:8081 http://google.com
